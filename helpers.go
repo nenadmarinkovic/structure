@@ -33,33 +33,22 @@ func generateTree(path string, prefix string) (string, error) {
 		return files[i].Name() < files[j].Name()
 	})
 
-	tree := ""
+	list := ""
 
-	for i, file := range files {
+	for _, file := range files {
 		if isHidden(file.Name()) || file.Name() == "node_modules" || file.Name() == "README.md" {
 			continue
 		}
 
-		if i == len(files)-1 {
-			tree += fmt.Sprintf("%s└── %s\n", prefix, file.Name())
-			if file.IsDir() {
-				subTree, err := generateTree(filepath.Join(path, file.Name()), prefix+"    ")
-				if err != nil {
-					return "", err
-				}
-				tree += subTree
+		list += fmt.Sprintf("%s- %s\n", prefix, file.Name())
+		if file.IsDir() {
+			subList, err := generateTree(filepath.Join(path, file.Name()), prefix+"  ")
+			if err != nil {
+				return "", err
 			}
-		} else {
-			tree += fmt.Sprintf("%s├── %s\n", prefix, file.Name())
-			if file.IsDir() {
-				subTree, err := generateTree(filepath.Join(path, file.Name()), prefix+"│   ")
-				if err != nil {
-					return "", err
-				}
-				tree += subTree
-			}
+			list += subList
 		}
 	}
 
-	return tree, nil
+	return list, nil
 }
